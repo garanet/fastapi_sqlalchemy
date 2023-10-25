@@ -1,8 +1,8 @@
 import uvicorn, json
-from fastapi import Depends, FastAPI
+from fastapi import Depends, FastAPI, HTTPException
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
-from typing import List, Optional
+from typing import List,Optional
 from fastapi.encoders import jsonable_encoder
 import pandas as pd
 # IMPORT CUSTOM MODULES/LIBS
@@ -38,10 +38,10 @@ def realtime_fetch_all_items_from_google_sheet(item_id):
                 result = json.loads(json.dumps(list(df.T.to_dict().values())))                        
         # Return the results
                 return jsonable_encoder(result)
-        except Exception as error:                
-            return jsonable_encoder({'ERROR': str(error)})    
+        except:                
+            raise HTTPException(status_code=404, detail=str("Error from the global function"))              
     else:
-        return jsonable_encoder({'ERROR': "Google item_id empty or malformat"})  
+        raise HTTPException(status_code=404, detail=str("Google item_id empty or malformat"))  
     
 # FETCH THE GOOGLE SHEET BY ID AND STORE ITEMS TO DB  
 @app.post('/cronjob', tags=["CronJob to add or update the DB"],status_code=201)
@@ -52,7 +52,7 @@ async def fetch_all_items_from_google_and_store_update_to_db(item_id, db: Sessio
             values = jsonable_encoder(google_fetch(item_id))
         # Check errors from the Google response and sanitize result
             if "error" in values:  
-                return jsonable_encoder({'GOOGLE ERROR': str(values['error']['error_details'])})
+                return jsonable_encoder({'GOOGLE ERROR': str(values['error']['error_details'])})                
             else:                        
         # Check if the Google sheet already exists in DB
                 db_store = StoreRepo.fetch_by_name(db, name=item_id)            
@@ -66,32 +66,39 @@ async def fetch_all_items_from_google_and_store_update_to_db(item_id, db: Sessio
                         db_item.description = update_item_encoded['description']
                         db_item.image = update_item_encoded['image']                    
                         db_item.name = update_item_encoded['name']    
-                        update_result = await ItemRepo.update(db=db, item_data=db_item)
+                        update_result = await ItemRepo.update(db=db, item_data=db_item)                    
                     return {'Spreadsheet': "UPDATED"}     
                 else:
         # Create the new DB with the new Google sheet name with relationship                        
-                    result = await StoreRepo.create(db=db, name=item_id)
+                    result = await StoreRepo.create(db=db, name=item_id)                    
                     for item in values:
-                        added_result = await ItemRepo.create(db=db, item=item, name=item_id)
+                        added_result = await ItemRepo.create(db=db, item=item, name=result.id)
                     return {'Spreadsheet': "ADDED"}
-        except Exception as error:        
-            return jsonable_encoder({'ERROR': str(error)})     
+        except:
+            raise HTTPException(status_code=404, detail=str("Error from the global function"))             
     else:
-        return jsonable_encoder({'ERROR': "Google item_id empty or malformat"})  
+       raise HTTPException(status_code=404, detail=str("Google item_id empty or malformat"))  
         
 # QUERY THE DB BY ID AND SHOW THE RESULTS
-@app.get('/query', tags=["Query the DB"],response_model=List[schemas.Store])
+@app.get('/query', tags=["Query the DB"],response_model=List[schemas.StoreBase])
 def get_items_from_db_by_google_id(item_id: Optional[str] = None,db: Session = Depends(get_db)):    
     # Get all the Items stored in database    
     try:
-        if item_id:                    
-            db_item = ItemRepo.fetch_all_by_name(db,item_id)               
-            return jsonable_encoder(db_item)
+        if item_id:       
+        # Get the item_id from the TABLE data
+            store_id = StoreRepo.fetch_by_name(db, name=item_id)                           
+        # Get the items from the TABLE item related to the above store_id
+            db_item = ItemRepo.fetch_all_by_name(db, name=store_id.id)            
+            if db_item:                
+                return jsonable_encoder(db_item)
+            else:
+                raise HTTPException(status_code=404, detail=str("Google item_id not found in the DB"))
         else:
-            return jsonable_encoder({'ERROR': "Google item_id empty or malformat"})            
-    except Exception as error:        
-        return jsonable_encoder({'ERROR': str(error)})    
-    
+            raise HTTPException(status_code=404, detail=str("Google item_id empty or malformat"))
+    except:
+        raise HTTPException(status_code=404, detail=str("Google item_id empty or not found in the DB"))
+        
+# Main Function, with or without SSL    
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=9000, reload=True, log_level="info")
+    uvicorn.run("main:app", host="0.0.0.0", port=9000, reload=True, log_level="info")    
     # uvicorn.run("main:app", host="0.0.0.0", port=9000, reload=True, ssl_keyfile="./key.pem", ssl_certfile="./cert.pem",log_level="info")

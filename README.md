@@ -49,7 +49,7 @@ REST API access to items resources.
 - Docker to test with containers.
 - Kubernetes with HelmChart/FluxCD for a cluster deployment.
 
-### SETUP & RUN
+### SETUP & RUN ###
 There are 3 differents setup to run this project:
 - Local Python env
 - Docker 
@@ -152,13 +152,13 @@ $ docker build -t fastapi:latest .
 4. Export the docker image.
 
 ```bash
-# docker save fastapi:latest > fastapi.tar
+$ docker save fastapi:latest > fastapi.tar
 ```
 
 5. Export the docker image.
 
 ```bash
-# microk8s ctr image import latest.tar
+$ microk8s ctr image import fastapi.tar
 ```
 
 6. Deploy the deployment.yml file into your helmcharts/orchestra tool
@@ -166,9 +166,37 @@ $ docker build -t fastapi:latest .
 ```bash
 $ flux reconcile ks microservices
 ```
+
+### Testing ###
+- Swagger UI is used to test it via browser. Visit the [swagger at 127.0.0.1:9000 ](http://127.0.0.1:9000) 
+- Use curl from your terminal to:
+
+***GET /fetch/{item_id} -> "Get items from Google without store them"***
+```bash
+curl -X 'GET' \
+  'http://127.0.0.1:9000/fetch/{google_spreadsheet_id}' \latest.tar
+  -H 'accept: application/json'
+ ```
+
+***POST /cronjob/{item_id} -> "Get items and store or update them into the DB"***
+```bash
+curl -X 'POST' \
+  'http://127.0.0.1:9000/cronjob?item_id=1LAvH4wPOXZSdfVRRHwDGaS5ensyQg2TNm_eoISNcnQg' \
+  -H 'accept: application/json' \
+  -d ''
+ ```
+ 
+ ***GET /querey/{item_id} -> "Get items from the DB"***
+```bash
+curl -X 'GET' \
+  'http://127.0.0.1:9000/query?item_id=1LAvH4wPOXZSdfVRRHwDGaS5ensyQg2TNm_eoISNcnQg' \
+  -H 'accept: application/json'
+```
+
 ---
 
 ### How it works
+
 - Google
 - Database
 - Database Models
@@ -485,13 +513,14 @@ if __name__ == "__main__":
 ### REFERENCES ###
 
 - [FastAPI sql db](https://fastapi.tiangolo.com/tutorial/sql-databases/)
+- [FastAPI errors message](https://fastapi.tiangolo.com/tutorial/handling-errors/)
 - [SQLAlchemy](https://www.sqlalchemy.org/)
 - [Google Quickstart](https://developers.google.com/sheets/api/quickstart/python)
 - [Panda Dataframe](https://pandas.pydata.org/)
 
 ### TO DO ###
 
-- [ ]  Encrypt the Google Credentials file or use a keypass/password manager.
+- [ ] Encrypt the Google Credentials file or use a keypass/password manager.
 - [ ] Enable the https protocol in uvicorn, generating the key and the pem file.
 - [ ] Improve the error messages using the fastapi classes
 - [ ] Improve the async and managing timeout session for big file.

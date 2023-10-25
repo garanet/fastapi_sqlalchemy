@@ -17,8 +17,8 @@ class ItemRepo:
     def fetch_by_name(db: Session,name):
         return db.query(models.Item).filter(models.Item.name == name).first()
 
-    def fetch_all_by_name(db: Session, item_id, skip: int = 0, limit: int = 1000):
-        return db.query(models.Item).filter(models.Item.name == item_id).offset(skip).limit(limit).all()    
+    def fetch_all_by_name(db: Session, name, skip: int = 0, limit: int = 1000):
+        return db.query(models.Item).filter(models.Item.name == name).offset(skip).limit(limit).all()    
 
     def fetch_all(db: Session, skip: int = 0, limit: int = 1000):
         return db.query(models.Item).offset(skip).limit(limit).all()  
