@@ -60,8 +60,8 @@ There are 3 differents setup to run this project:
 1. Clone the reposistory
 
 ```bash
-$ git clone XXXX
-$ cd fastapi
+$ git clone git@github.com:garanet/fastapi_sqlalchemy.git
+$ cd fastapi_sqlalchemy
 ```
 
 2. Activate Virtual Environment.
@@ -105,8 +105,8 @@ $ python main.py
 1. Clone the reposistory
 
 ```bash
-$ git clone XXXX
-$ cd fastapi
+$ git clone git@github.com:garanet/fastapi_sqlalchemy.git
+$ cd fastapi_sqlalchemy
 ```
 
 2. Copy the credentials.json file downloaded from google dev-api.
@@ -133,8 +133,8 @@ $ docker run -p 9000:9000  fastapi
 1. Clone the reposistory
 
 ```bash
-$ git clone XXXX
-$ cd fastapi
+$ git clone git@github.com:garanet/fastapi_sqlalchemy.git
+$ cd fastapi_sqlalchemy
 ```
 
 2. Copy the credentials.json file downloaded from google dev-api.
