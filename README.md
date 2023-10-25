@@ -484,15 +484,14 @@ if __name__ == "__main__":
 
 ### REFERENCES ###
 
-[FastAPI sql db](https://fastapi.tiangolo.com/tutorial/sql-databases/)
-[SQLAlchemy](https://www.sqlalchemy.org/)
-[Google Quickstart](https://developers.google.com/sheets/api/quickstart/python)
-[Panda Dataframe](https://pandas.pydata.org/)
+- [FastAPI sql db](https://fastapi.tiangolo.com/tutorial/sql-databases/)
+- [SQLAlchemy](https://www.sqlalchemy.org/)
+- [Google Quickstart](https://developers.google.com/sheets/api/quickstart/python)
+- [Panda Dataframe](https://pandas.pydata.org/)
+
 ### TO DO ###
 
 - [ ]  Encrypt the Google Credentials file or use a keypass/password manager.
 - [ ] Enable the https protocol in uvicorn, generating the key and the pem file.
 - [ ] Improve the error messages using the fastapi classes
 - [ ] Improve the async and managing timeout session for big file.
-
-    
