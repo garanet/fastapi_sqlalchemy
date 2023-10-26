@@ -1,11 +1,11 @@
-# PoC with FastAPI, SQLAlchemy & Uvicorn to fetch a Google Sheet
+# PoC - FastAPI, SQLAlchemy & Uvicorn to fetch a Google Sheet
 
-With this PoC we can use FastAPI with SQLAlchemy, to :
-- Fetch items from a Google Sheets document (range A:C cells) based on the Google spreadsheet ID.
+This PoC is using FastAPI with SQLAlchemy, to :
+- Fetch items from a Google Sheets document (range A:C cells), based on the Google spreadsheet ID.
 - Store the items into a database (SQLite,Postgres,Mysql,MSSQL,Oracle).
 - Serve the items from the DB, via Restful API.
 
-Helpful to use it like a cronjob/task that triggers every 5 minutes the endpoint /cronjob/{item_id}
+Helpful for a cronjob/task that triggers every 5 minutes the endpoint "/cronjob/{item_id}"
 It will check if it's a new Spreadsheet or already exists. 
 In the first case it will create a new RECORD inside the TABLE data, otherwise it will update the existing TABLE items with the new items.
 
@@ -155,7 +155,7 @@ $ docker build -t fastapi:latest .
 $ docker save fastapi:latest > fastapi.tar
 ```
 
-5. Export the docker image.
+5. Import the docker tar file in microk8s
 
 ```bash
 $ microk8s ctr image import fastapi.tar
@@ -522,5 +522,4 @@ if __name__ == "__main__":
 
 - [ ] Encrypt the Google Credentials file or use a keypass/password manager.
 - [ ] Enable the https protocol in uvicorn, generating the key and the pem file.
-- [ ] Improve the error messages using the fastapi classes
 - [ ] Improve the async and managing timeout session for big file.
